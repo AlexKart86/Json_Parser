@@ -56,7 +56,7 @@ lexeme *parse_lexeme(char *error){
     short is_inline_comments = 0;
     short is_block_comments = 0;
     short is_in_s_quote = 0;
-    short is_in_d_quote = 0;  //
+    short is_in_d_quote = 0;
 
     while ((ch = read_char()) != EOF){
       if (ch == '/')
