@@ -280,6 +280,7 @@ json_value* json_parse(const char* file_name, char* error){
         switch (l->type){
         case open_brake:
             new_complex_value(&top, &root, json_section);
+            break;
         case d_point:
             next_lex = parse_lexeme(error);
             if (next_lex == NULL)
