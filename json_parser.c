@@ -29,10 +29,12 @@ void add_char(char *str, char ch){
 }
 
 FILE *in;
+fpos_t *prev_position;
 int cur_row = 1;
 int cur_column = 1;
 
 char read_char(){
+    fgetpos(in, prev_position);
     char ch = fgetc(in);
     if (ch == '\r'){
         cur_row ++;
@@ -120,7 +122,8 @@ lexeme *parse_lexeme(char *error){
 
           if ((ch == '{' ||  ch == '}' || ch == ':' || ch == '[' || ch == ']' || ch == ',') && strlen(res->str) > 0)
           {
-              fseek(in, -1, SEEK_CUR);
+              //fseek(in, -1, SEEK_CUR); //Not working. I don't know why
+              fsetpos(in, prev_position);
               res->type = string;
               return res;
           }
