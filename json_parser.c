@@ -46,6 +46,21 @@ char read_char(){
     return ch;
 }
 
+lexeme_type detect_lexeme_type(char *str){
+   if (!strcmp(str, "true")|| !strcmp(str, "false")){
+                return b_value;
+              }
+   if (atol(str)||!strcmp(str, "0")){
+                return i_value;
+              }
+    if (atof(str) || !strcmp(str, "0.0")){
+                return d_value;
+      }
+    //TO DO: hex parse
+       else{
+          return string;
+    }
+}
 
 //Parsing lexeme from file
 lexeme *parse_lexeme(char *error){
@@ -124,7 +139,7 @@ lexeme *parse_lexeme(char *error){
           {
               fseek(in, -1, SEEK_CUR);
               //fsetpos(in, prev_position);
-              res->type = string;
+              res->type = detect_lexeme_type(res->str);
               return res;
           }
 
@@ -165,22 +180,8 @@ lexeme *parse_lexeme(char *error){
             }
             else{
               add_char(res->str, ch);
-              if (!strcmp(res->str, "true")|| !strcmp(res->str, "false")){
-                res->type = b_value;
-                return res;
-              }
-              if (atol(res->str)||!strcmp(res->str, "0")){
-                res->type = i_value;
-                return res;
-              }
-              if (atof(res->str) || !strcmp(res->str, "0.0")){
-                res->type = d_value;
-                return res;
-              }
-              else{
-                res->type = string;
-                return res;
-              }
+              res->type = detect_lexeme_type(res->str);
+              return res;
             }
           }
       }
@@ -188,6 +189,67 @@ lexeme *parse_lexeme(char *error){
     return NULL;
 }
 
+json_value* new_complex_value(json_value** top, json_value** root, json_value_type v_type){
+    json_value *value = (json_value *)malloc(sizeof(json_value));
+
+    if (v_type == json_array || v_type == json_section){
+        value->parent = *top;
+        value->type = v_type;
+        *top = value;
+        if (root == NULL)
+          root = top;
+    }
+
+    switch (v_type){
+        json_array:
+            value->u.arr.len = 0;
+            break;
+        json_section:
+            value->u.section.len = 0;
+            break;
+    }
+    return value;
+}
+
+json_value* new_simple_value(json_value* top, lexeme lex){
+  json_value *value = (json_value *)malloc(sizeof(json_value));
+  value->parent = top;
+  switch (lex.type){
+      string:
+           value->u.s_value = malloc(strlen(lex.str)+1);
+           strcpy(value->u.s_value, lex.str);
+           value->type = json_string;
+           break;
+      d_value:
+           value->u.d_value = atof(lex.str);
+           value->type = json_double;
+           break;
+      i_value:
+           value->u.l_value = atol(lex.str);
+           value->type = json_long;
+           break;
+      b_value:
+            value->type = json_boolean;
+            if (!strcmp(lex.str, "true")){
+                value->u.b_value = 1;
+            }
+            else
+                value->u.b_value = 0;
+            break;
+  }
+  return value;
+}
+
+
+//Add section to object
+void add_section_item(json_value *top, char* section_name, json_value* value){
+    section_item* it = (section_item *)malloc(sizeof(section_item));
+    strcpy(it->name, section_name);
+    it->value = value;
+    top->u.section.len ++;
+    top->u.section.sections = realloc(top->u.section.sections, sizeof(section_item)*top->u.section.len);
+    top->u.section.sections[top->u.section.len-1] = it;
+}
 
 
 json_value* json_parse(const char* file_name, char* error){
@@ -203,16 +265,33 @@ json_value* json_parse(const char* file_name, char* error){
   char buf[1000];
   int is_read_open_b = 0;
 
+  json_value* root = NULL;
+  json_value* top = NULL;
 
+  lexeme *prev_lex = NULL;
+  lexeme *next_lex = NULL;
 
   while (1){
      lexeme *l = parse_lexeme(error);
+
      if (l != NULL){
-        printf(l->str);
-        printf("\n");
+        /*printf(l->str);
+        printf("\n");*/
+        switch (l->type){
+        case open_brake:
+            new_complex_value(&top, &root, json_section);
+        case d_point:
+            next_lex = parse_lexeme(error);
+            if (next_lex == NULL)
+                return;
+            json_value *val = new_simple_value(top, *next_lex);
+            add_section_item(top, prev_lex->str, val);
+            break;
+        }
      }
      else
         return NULL;
+     prev_lex = l;
   }
 
   fclose(in);

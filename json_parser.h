@@ -31,8 +31,8 @@ typedef struct _value{
     //section
     struct{
       unsigned int len;
-      section_item *sections;
-    };
+      section_item **sections;
+    } section;
   } u;
 } json_value;
 

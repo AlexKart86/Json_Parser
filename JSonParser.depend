@@ -1,12 +1,12 @@
 # depslib dependency file v1.0
-1469395538 source:k:\docs\json_parser\json_parser.c
+1469401842 source:k:\docs\json_parser\json_parser.c
 	"json_parser.h"
 	"stdio.h"
 	"stdlib.h"
 	"string.h"
 	"ctype.h"
 
-1469370480 k:\docs\json_parser\json_parser.h
+1469400865 k:\docs\json_parser\json_parser.h
 
 1469395552 source:k:\docs\json_parser\test.c
 	"stdio.h"
