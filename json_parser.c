@@ -29,12 +29,12 @@ void add_char(char *str, char ch){
 }
 
 FILE *in;
-fpos_t *prev_position;
+//fpos_t *prev_position;
 int cur_row = 1;
 int cur_column = 1;
 
 char read_char(){
-    fgetpos(in, prev_position);
+    //fgetpos(in, prev_position);
     char ch = fgetc(in);
     if (ch == '\r'){
         cur_row ++;

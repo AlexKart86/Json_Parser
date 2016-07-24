@@ -51,11 +51,25 @@ int main(){
 
  char error[2000];
  json_value* p = json_parse("k:\\DOCS\\JSON_Parser\\sample.conf", error);
- /*char a[100];
- a[0] = '\0';
- add_char1(a, 'd');
- add_char1(a, 'a');
- add_char1(a, 'c');
- printf(a);*/
+ /*FILE* fp = fopen("k:\\DOCS\\JSON_Parser\\sample.conf", "rb");
+ fseek(fp, 0, SEEK_CUR);
+ char ch;
+ for (int i=0; i<20; ++i){
+    ch = fgetc(fp);
+    printf("%c %ld \n", ch, ftell(fp));
+ }
+ //fseek(fp, -1, SEEK_CUR);
+ printf("~~~~\n");
+ long l = ftell(fp);
+ printf("%lu", l);
+ fseek(fp, (long)-1, SEEK_CUR);
+ printf("~~~~\n");
+ printf("%lu", ftell(fp));
+ printf("----\n");
+    ch = fgetc(fp);
+    printf("%c\n ", ch);
+    ch = fgetc(fp);
+    printf("%c\n", ch);
+ fclose(fp) ;*/
  return 0;
 }
