@@ -120,8 +120,9 @@ lexeme *parse_lexeme(char *error){
 
           if ((ch == '{' ||  ch == '}' || ch == ':' || ch == '[' || ch == ']' || ch == ',') && strlen(res->str) > 0)
           {
-              sprintf(error, "Invalid symbol %c on line %d column %d", ch, cur_row, cur_column);
-              return NULL;
+              fseek(in, -1, SEEK_CUR);
+              res->type = string;
+              return res;
           }
 
           switch (ch){
@@ -138,21 +139,25 @@ lexeme *parse_lexeme(char *error){
           case '[':
             res->type = open_array;
             add_char(res->str, ch);
+            return res;
             break;
           case ']':
             res->type = close_array;
             add_char(res->str, ch);
+            return res;
             break;
           case ':':
             res->type = d_point;
             add_char(res->str, ch);
+            return res;
             break;
           case ',':
              res->type = comma;
              add_char(res->str, ch);
+             return res;
              break;
           default:
-            if (isalpha(ch) || isdigit(ch) || ch == '-' || ch=='+' || ch =='.'){
+            if (isalpha(ch) || isdigit(ch) || ch == '-' || ch=='+' || ch =='.' || ch == '_'){
                 add_char(res->str, ch);
             }
             else{
