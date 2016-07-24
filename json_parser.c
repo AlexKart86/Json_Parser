@@ -122,8 +122,8 @@ lexeme *parse_lexeme(char *error){
 
           if ((ch == '{' ||  ch == '}' || ch == ':' || ch == '[' || ch == ']' || ch == ',') && strlen(res->str) > 0)
           {
-              //fseek(in, -1, SEEK_CUR); //Not working. I don't know why
-              fsetpos(in, prev_position);
+              fseek(in, -1, SEEK_CUR);
+              //fsetpos(in, prev_position);
               res->type = string;
               return res;
           }
@@ -191,7 +191,7 @@ lexeme *parse_lexeme(char *error){
 
 
 json_value* json_parse(const char* file_name, char* error){
-  in = fopen(file_name, "r");
+  in = fopen(file_name, "rb");
   cur_column = 1;
   cur_row = 1;
   if (in == NULL){
