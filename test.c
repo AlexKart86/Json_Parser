@@ -49,18 +49,13 @@ int main(){
  printf(arr[1]);
  }*/
 
-/*char error[1024];
-json_value* p = json_parse("k:\\DOCS\\JSON_Parser\\sample.conf", error);
-if (p==NULL){
-    printf(error);
-}
-else{
-printf("aaa");*/
- char a[100];
+ char error[2000];
+ json_value* p = json_parse("k:\\DOCS\\JSON_Parser\\sample.conf", error);
+ /*char a[100];
  a[0] = '\0';
  add_char1(a, 'd');
  add_char1(a, 'a');
  add_char1(a, 'c');
- printf(a);
+ printf(a);*/
  return 0;
 }

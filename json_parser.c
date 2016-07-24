@@ -2,6 +2,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
+#include "ctype.h"
 
 typedef enum{
   open_brake,
@@ -40,12 +41,14 @@ char read_char(){
     else if (ch != '\n'){
         cur_column++;
     }
+    return ch;
 }
 
 
 //Parsing lexeme from file
-lexeme *parse_lexeme(FILE *in, char *error){
+lexeme *parse_lexeme(char *error){
     lexeme *res = (lexeme *)malloc(sizeof(lexeme));
+    res->str[0]='\0';
     char ch;
     int length = 0;
     short is_inline_comments = 0;
@@ -57,7 +60,7 @@ lexeme *parse_lexeme(FILE *in, char *error){
       if (ch == '/')
       {
           if (is_in_s_quote || is_in_d_quote)
-            add_char(res->str, ch)
+            add_char(res->str, ch);
           else{
             char ch1 = fgetc(in);
             switch (ch1){
@@ -67,10 +70,9 @@ lexeme *parse_lexeme(FILE *in, char *error){
              case '*':
                 is_block_comments = 1;
                 break;
-              else{
+              default:
                 sprintf(error, "Error: expected / or * in line %d column %d", cur_row, cur_column);
                 return NULL;
-              }
             }
           }
       }
@@ -96,19 +98,36 @@ lexeme *parse_lexeme(FILE *in, char *error){
             is_in_d_quote = 1;
       }
       else  if (is_in_d_quote || is_in_s_quote){
-        add_char(res->str, ch)
+        add_char(res->str, ch);
+      }
+      else if (is_block_comments){
+        if (ch == '*'){
+            ch = read_char();
+            if (ch == '/')
+                is_block_comments = 0;
+        }
+      }
+      else if (is_inline_comments){
+        if (ch == '\r' || ch == '\n'){
+            is_inline_comments = 0;
+        }
+      }
+      else if ((ch == '\t' || ch == ' ' || ch == '\n' || ch == '\r') && strlen(res->str) == 0)
+      {
+
       }
       else {
 
-          if ((ch == '{' ||  ch == '}' || ch == ':' || ch == '[' || ch == ']') && strlen(res->str) > 0)
+          if ((ch == '{' ||  ch == '}' || ch == ':' || ch == '[' || ch == ']' || ch == ',') && strlen(res->str) > 0)
           {
-              sprintf(error, "Invalid symbol on line %d column %d", cur_row, cur_column);
+              sprintf(error, "Invalid symbol %c on line %d column %d", ch, cur_row, cur_column);
               return NULL;
           }
 
           switch (ch){
           case '{':
             res->type = open_brake;
+            add_char(res->str, ch);
             return res;
             break;
           case '}':
@@ -116,10 +135,49 @@ lexeme *parse_lexeme(FILE *in, char *error){
             add_char(res->str, ch);
             return res;
             break;
-
+          case '[':
+            res->type = open_array;
+            add_char(res->str, ch);
+            break;
+          case ']':
+            res->type = close_array;
+            add_char(res->str, ch);
+            break;
+          case ':':
+            res->type = d_point;
+            add_char(res->str, ch);
+            break;
+          case ',':
+             res->type = comma;
+             add_char(res->str, ch);
+             break;
+          default:
+            if (isalpha(ch) || isdigit(ch) || ch == '-' || ch=='+' || ch =='.'){
+                add_char(res->str, ch);
+            }
+            else{
+              add_char(res->str, ch);
+              if (!strcmp(res->str, "true")|| !strcmp(res->str, "false")){
+                res->type = b_value;
+                return res;
+              }
+              if (atol(res->str)||!strcmp(res->str, "0")){
+                res->type = i_value;
+                return res;
+              }
+              if (atof(res->str) || !strcmp(res->str, "0.0")){
+                res->type = d_value;
+                return res;
+              }
+              else{
+                res->type = string;
+                return res;
+              }
+            }
           }
       }
     }
+    return NULL;
 }
 
 
@@ -139,8 +197,14 @@ json_value* json_parse(const char* file_name, char* error){
 
 
 
-  while ((ch = fgetc(in)) != EOF){
-
+  while (1){
+     lexeme *l = parse_lexeme(error);
+     if (l != NULL){
+        printf(l->str);
+        printf("\n");
+     }
+     else
+        return NULL;
   }
 
   fclose(in);
