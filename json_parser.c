@@ -22,6 +22,13 @@ typedef struct _lexeme{
     char str[1000];
 } lexeme;
 
+//strcpy + allocation memory
+char *strcpy_a(char* str){
+    char* res = malloc(strlen(str));
+    strcpy(res, str);
+    return res;
+}
+
 void add_char(char *str, char ch){
     int len = strlen(str);
     str[len] = ch;
@@ -195,18 +202,19 @@ json_value* new_complex_value(json_value** top, json_value** root, json_value_ty
     if (v_type == json_array || v_type == json_section){
         value->parent = *top;
         value->type = v_type;
-        *top = value;
-        if (root == NULL)
-          root = top;
-    }
-
-    switch (v_type){
+        switch (v_type){
         json_array:
             value->u.arr.len = 0;
             break;
         json_section:
             value->u.section.len = 0;
             break;
+        }
+        value->u.section.len = 0;
+        *top = value;
+        if (*root == NULL){
+          *root = *top;
+        }
     }
     return value;
 }
@@ -216,7 +224,8 @@ json_value* new_simple_value(json_value* top, lexeme lex){
   value->parent = top;
   switch (lex.type){
       string:
-           value->u.s_value = malloc(strlen(lex.str)+1);
+           value->u.s_value = strcpy_a(lex.str);
+           //value->u.s_value = malloc(strlen(lex.str)+1);
            strcpy(value->u.s_value, lex.str);
            value->type = json_string;
            break;
@@ -244,7 +253,7 @@ json_value* new_simple_value(json_value* top, lexeme lex){
 //Add section to object
 void add_section_item(json_value *top, char* section_name, json_value* value){
     section_item* it = (section_item *)malloc(sizeof(section_item));
-    strcpy(it->name, section_name);
+    it->name = strcpy_a(section_name);
     it->value = value;
     top->u.section.len ++;
     top->u.section.sections = realloc(top->u.section.sections, sizeof(section_item)*top->u.section.len);
@@ -261,32 +270,35 @@ json_value* json_parse(const char* file_name, char* error){
     return NULL;
   }
 
-  char ch;
-  char buf[1000];
   int is_read_open_b = 0;
 
   json_value* root = NULL;
   json_value* top = NULL;
 
-  lexeme *prev_lex = NULL;
-  lexeme *next_lex = NULL;
+  char section_name[1000];
+  lexeme* prev_lex;
 
   while (1){
      lexeme *l = parse_lexeme(error);
 
      if (l != NULL){
-        /*printf(l->str);
-        printf("\n");*/
+        printf(l->str);
+        printf("\n");
         switch (l->type){
         case open_brake:
             new_complex_value(&top, &root, json_section);
             break;
         case d_point:
-            next_lex = parse_lexeme(error);
-            if (next_lex == NULL)
-                return;
-            json_value *val = new_simple_value(top, *next_lex);
-            add_section_item(top, prev_lex->str, val);
+            strcpy(section_name, prev_lex->str);
+            break;
+        case string:
+        case i_value:
+        case b_value:
+        case d_value:
+            if (prev_lex->type == d_point){
+                json_value* val = new_simple_value(top, *l);
+                add_section_item(top, section_name, val);
+            }
             break;
         }
      }
