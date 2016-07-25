@@ -203,10 +203,10 @@ json_value* new_complex_value(json_value** top, json_value** root, json_value_ty
         value->parent = *top;
         value->type = v_type;
         switch (v_type){
-        json_array:
+        case json_array:
             value->u.arr.len = 0;
             break;
-        json_section:
+        case json_section:
             value->u.section.len = 0;
             break;
         }
@@ -223,21 +223,21 @@ json_value* new_simple_value(json_value* top, lexeme lex){
   json_value *value = (json_value *)malloc(sizeof(json_value));
   value->parent = top;
   switch (lex.type){
-      string:
+      case string:
            value->u.s_value = strcpy_a(lex.str);
            //value->u.s_value = malloc(strlen(lex.str)+1);
            strcpy(value->u.s_value, lex.str);
            value->type = json_string;
            break;
-      d_value:
+      case d_value:
            value->u.d_value = atof(lex.str);
            value->type = json_double;
            break;
-      i_value:
+      case i_value:
            value->u.l_value = atol(lex.str);
            value->type = json_long;
            break;
-      b_value:
+      case b_value:
             value->type = json_boolean;
             if (!strcmp(lex.str, "true")){
                 value->u.b_value = 1;

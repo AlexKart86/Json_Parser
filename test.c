@@ -50,7 +50,7 @@ int main(){
  }*/
 
  char error[2000];
- json_value* p = json_parse("k:\\DOCS\\JSON_Parser\\sample.conf", error);
+ json_value* p = json_parse("d:\\JSon_Parser\\\sample.conf", error);
  /*FILE* fp = fopen("k:\\DOCS\\JSON_Parser\\sample.conf", "rb");
  fseek(fp, 0, SEEK_CUR);
  char ch;
