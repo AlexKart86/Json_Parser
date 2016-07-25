@@ -37,5 +37,7 @@ typedef struct _value{
 } json_value;
 
 json_value* json_parse(const char* file_name, char* error);
+//For testing
+void print_json(json_value* arr);
 
 

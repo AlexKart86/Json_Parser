@@ -50,7 +50,21 @@ int main(){
  }*/
 
  char error[2000];
- json_value* p = json_parse("d:\\JSon_Parser\\\sample.conf", error);
+
+ json_value* p = json_parse("k:\\DOCS\\JSON_Parser\\test2.json", error);
+ if (strlen(error)>0) {
+    printf(error);
+ }
+ else
+ {
+     /*if (p->type == json_section){
+        printf("Yes!");
+        for (int i=0; i < p->u.section.len; ++i){
+            printf("%s\n", p->u.section.sections[i]->name);
+        }
+     }*/
+     print_json(p);
+ }
  /*FILE* fp = fopen("k:\\DOCS\\JSON_Parser\\sample.conf", "rb");
  fseek(fp, 0, SEEK_CUR);
  char ch;

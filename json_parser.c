@@ -264,15 +264,50 @@ void add_section_item(json_value *top, char* section_name, json_value* value){
 
 //Add item to array
 void add_array_item(json_value *arr, json_value *value){
-
+  arr->u.arr.len ++;
+  arr->u.arr.values = realloc(arr->u.arr.values, arr->u.arr.len*sizeof(section_item));
+  arr->u.arr.values[arr->u.arr.len-1] = value;
 }
 
-
+//For testing
+void print_json(json_value* arr){
+    if (arr == NULL) return;
+    switch(arr->type){
+    case json_boolean:
+        printf(" %d \n", arr->u.b_value);
+        break;
+    case json_double:
+        printf(" %f \n", arr->u.d_value);
+        break;
+    case json_long:
+        printf(" %ld \n", arr->u.d_value);
+        break;
+    case json_string:
+        printf(" %s \n", arr->u.s_value);
+        break;
+    case json_array:
+        printf(" [ ");
+        for (int i=0; i<arr->u.arr.len; ++i){
+            print_json(arr->u.arr.values[i]);
+        }
+        printf(" ]");
+        break;
+    case json_section:
+        {
+            for (int i=0; i<arr->u.section.len; ++i){
+                printf("%s : ", arr->u.section.sections[i]->name);
+                print_json(arr->u.section.sections[i]->value);
+            }
+        }
+     }
+}
 
 json_value* json_parse(const char* file_name, char* error){
   in = fopen(file_name, "rb");
   cur_column = 1;
   cur_row = 1;
+  error[0] = '\0';
+
   if (in == NULL){
     sprintf(error, "Cannot open file %s", file_name);
     return NULL;
@@ -318,6 +353,12 @@ json_value* json_parse(const char* file_name, char* error){
             }
             break;
         case close_array:
+              if (top == NULL || top->type != json_array){
+                sprintf(error, "Error: invalid symbol ']' on line %d column %d", cur_row, cur_column);
+                fclose(in);
+                return NULL;
+              }
+              top = top->parent;
               break;
 
         case string:
@@ -333,6 +374,7 @@ json_value* json_parse(const char* file_name, char* error){
             //array elements
             {
                json_value* val = new_simple_value(top, *l);
+               add_array_item(top, val);
             }
             break;
         }
