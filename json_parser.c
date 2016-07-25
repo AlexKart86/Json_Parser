@@ -262,6 +262,12 @@ void add_section_item(json_value *top, char* section_name, json_value* value){
     top->u.section.sections[top->u.section.len-1] = it;
 }
 
+//Add item to array
+void add_array_item(json_value *arr, json_value *value){
+
+}
+
+
 
 json_value* json_parse(const char* file_name, char* error){
   in = fopen(file_name, "rb");
@@ -274,7 +280,7 @@ json_value* json_parse(const char* file_name, char* error){
 
   json_value* root = NULL;
   json_value* top = NULL;
-  json_value* cur_array = NULL;
+  json_value* tmp = NULL;
 
   char section_name[1000];
   lexeme* prev_lex;
@@ -287,7 +293,7 @@ json_value* json_parse(const char* file_name, char* error){
         printf("\n");
         switch (l->type){
         case open_brake:
-            json_value* tmp = top;
+            tmp = top;
             new_complex_value(&top, &root, json_section);
             if (tmp != NULL){
                 add_section_item(tmp, section_name, top);
@@ -305,22 +311,28 @@ json_value* json_parse(const char* file_name, char* error){
             strcpy(section_name, prev_lex->str);
             break;
         case open_array:
-            json_value *tmp = top;
+            tmp = top;
             new_complex_value(&top, &root, json_array);
-            if (tmp != NULL)
-              {
+            if (tmp != NULL){
                 add_section_item(tmp, section_name, top);
-              }
+            }
             break;
         case close_array:
+              break;
 
         case string:
         case i_value:
         case b_value:
         case d_value:
+            //simple pair key:value
             if (prev_lex->type == d_point){
                 json_value* val = new_simple_value(top, *l);
                 add_section_item(top, section_name, val);
+            }
+            else if (top->type == json_array)
+            //array elements
+            {
+               json_value* val = new_simple_value(top, *l);
             }
             break;
         }
