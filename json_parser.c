@@ -205,9 +205,11 @@ json_value* new_complex_value(json_value** top, json_value** root, json_value_ty
         switch (v_type){
         case json_array:
             value->u.arr.len = 0;
+            value->u.arr.values = NULL;
             break;
         case json_section:
             value->u.section.len = 0;
+            value->u.section.sections = NULL;
             break;
         }
         value->u.section.len = 0;
