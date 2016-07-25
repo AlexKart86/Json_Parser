@@ -287,11 +287,16 @@ json_value* json_parse(const char* file_name, char* error){
         printf("\n");
         switch (l->type){
         case open_brake:
+            json_value* tmp = top;
             new_complex_value(&top, &root, json_section);
+            if (tmp != NULL){
+                add_section_item(tmp, section_name, top);
+            }
             break;
         case close_brake:
-            if (top == NULL){
+            if (top == NULL || top->type != json_section){
                sprintf(error, "Error: invalid symbol '}' on line %d column %d", cur_row, cur_column);
+               fclose(in);
                return NULL;
             }
             top = top->parent;
@@ -300,11 +305,14 @@ json_value* json_parse(const char* file_name, char* error){
             strcpy(section_name, prev_lex->str);
             break;
         case open_array:
-            cur_array = malloc(sizeof(json_value));
-            cur_array->arr.len = 0;
-            cur_array->arr.values = NULL;
-            add_section_item(top, section_name, cur_array);
+            json_value *tmp = top;
+            new_complex_value(&top, &root, json_array);
+            if (tmp != NULL)
+              {
+                add_section_item(tmp, section_name, top);
+              }
             break;
+        case close_array:
 
         case string:
         case i_value:
