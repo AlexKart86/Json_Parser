@@ -72,7 +72,7 @@ json_value* lookup_with_check(char *key){
 //set -1 at index;
 void str_extract_idx(char *str, int* index){
   char* ch = strtok(str, "[");
-  if (ch == str)
+  if (!strcmp(ch, str))
       *index = -1;
   else
   {
@@ -113,6 +113,12 @@ void config_open_section(const char *key, ...){
   json_value* val = lookup_with_check(v_key);
   check_value_type(v_key, val, json_section);
   current = val;
+}
+
+void config_close_section(void){
+  if (current->parent == NULL)
+    raise_error("Error: this is a root section");
+  current = current->parent;
 }
 
 char * config_get_string(const char *key, ...){

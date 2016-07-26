@@ -45,16 +45,20 @@ int main(){
 
  config_create("d:\\JSon_Parser\\test2.json");
 
- /*if (config_get_bool("arr[%d]", 2))
+ if (config_get_bool("arr[%d]", 0))
     printf("YES!!!!");
  else
-    printf("NOOOOOO");*/
+    printf("NOOOOOO");
 
    config_open_section("module_properties");
 
     char* vendor = config_get_string("vendor");
     printf("Running module by %s\n", vendor); //QWEsoft
     free(vendor);
+
+    config_close_section();
+    if (config_get_bool("arr[%d]", 0))
+        printf("YES!!!!");
 
 
 /* json_value* p = json_parse("k:\\DOCS\\JSON_Parser\\test2.json", error);
