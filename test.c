@@ -1,16 +1,8 @@
 #include "stdio.h"
 #include "stdarg.h"
 #include "json_parser.h"
+#include "config.h"
 
-void config_get_string(const char *key, ...)  __attribute__ ((format (printf, 1, 2)));
-
-void config_get_string(const char *key, ...)
-{
-  va_list args;
-  va_start(args, key);
-  vfprintf(stderr, key, args);
-  va_end(args);
-}
 
 void test(char **arr, int *cnt_msg){
     cnt_msg = 10;
@@ -51,7 +43,9 @@ int main(){
 
  char error[2000];
 
- json_value* p = json_parse("k:\\DOCS\\JSON_Parser\\test2.json", error);
+ config_create("d:\\JSon_Parser\\sample.conf");
+
+/* json_value* p = json_parse("k:\\DOCS\\JSON_Parser\\test2.json", error);
  if (strlen(error)>0) {
     printf(error);
  }
@@ -63,27 +57,7 @@ int main(){
             printf("%s\n", p->u.section.sections[i]->name);
         }
      }*/
-     print_json(p);
- }
- /*FILE* fp = fopen("k:\\DOCS\\JSON_Parser\\sample.conf", "rb");
- fseek(fp, 0, SEEK_CUR);
- char ch;
- for (int i=0; i<20; ++i){
-    ch = fgetc(fp);
-    printf("%c %ld \n", ch, ftell(fp));
- }
- //fseek(fp, -1, SEEK_CUR);
- printf("~~~~\n");
- long l = ftell(fp);
- printf("%lu", l);
- fseek(fp, (long)-1, SEEK_CUR);
- printf("~~~~\n");
- printf("%lu", ftell(fp));
- printf("----\n");
-    ch = fgetc(fp);
-    printf("%c\n ", ch);
-    ch = fgetc(fp);
-    printf("%c\n", ch);
- fclose(fp) ;*/
+  //   print_json(p);
+ //}
  return 0;
 }

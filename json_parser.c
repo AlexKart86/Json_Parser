@@ -242,10 +242,10 @@ json_value* new_simple_value(json_value* top, lexeme lex){
       case b_value:
             value->type = json_boolean;
             if (!strcmp(lex.str, "true")){
-                value->u.b_value = 1;
+                value->u.b_value = true;
             }
             else
-                value->u.b_value = 0;
+                value->u.b_value = false;
             break;
   }
   return value;

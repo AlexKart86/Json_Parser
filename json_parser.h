@@ -1,3 +1,5 @@
+#include "stdbool.h"
+
 //Json value types
 typedef enum {
    json_long,
@@ -7,6 +9,8 @@ typedef enum {
    json_section,
    json_array
 } json_value_type;
+
+static const char* json_value_type_str[] = {"long", "double", "string", "boolean", "section", "array"};
 
 //Pair: <key: value>
 typedef struct _section_item{
@@ -19,7 +23,7 @@ typedef struct _value{
   struct _json_value *parent; //link to parent section
   json_value_type type;//type of value
   union{
-    short b_value;
+    bool b_value;
     long l_value;
     double d_value;
     char* s_value;
