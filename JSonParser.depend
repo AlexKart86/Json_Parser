@@ -32,7 +32,7 @@
 1469527289 d:\json_parser\json_parser.h
 	"stdbool.h"
 
-1469529807 source:d:\json_parser\test.c
+1469546964 source:d:\json_parser\test.c
 	"stdio.h"
 	"stdarg.h"
 	"json_parser.h"
@@ -44,12 +44,12 @@
 	<stdlib.h>
 	"config.h"
 
-1469525410 d:\json_parser\config.h
+1469542555 d:\json_parser\config.h
 	<stdbool.h>
 
-1469529820 source:d:\json_parser\config.c
+1469542914 source:d:\json_parser\config.c
 	"config.h"
 	"json_parser.h"
-	"stdio.h"
-	"stdarg.h"
+	<stdio.h>
+	<stdarg.h>
 

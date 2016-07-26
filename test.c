@@ -43,12 +43,18 @@ int main(){
 
  char error[2000];
 
- config_create("d:\\JSon_Parser\\sample.conf");
+ config_create("d:\\JSon_Parser\\test2.json");
 
- if (config_get_bool("scale"))
+ /*if (config_get_bool("arr[%d]", 2))
     printf("YES!!!!");
  else
-    printf("NOOOOOO");
+    printf("NOOOOOO");*/
+
+   config_open_section("module_properties");
+
+    char* vendor = config_get_string("vendor");
+    printf("Running module by %s\n", vendor); //QWEsoft
+    free(vendor);
 
 
 /* json_value* p = json_parse("k:\\DOCS\\JSON_Parser\\test2.json", error);
