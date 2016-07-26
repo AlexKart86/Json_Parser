@@ -7,6 +7,8 @@ json_value* root;
 json_value* current;
 char error[1000];
 
+//Macro for make string from format string
+//in functions with variable params
 #define format(msg, fmt) \
      va_list arg; \
      va_start(arg, (fmt));\
@@ -29,8 +31,7 @@ void raise_error(char* error_msg, ... ){
 //Raise error if type of val <> type
 void check_value_type(char* section_name, json_value* val, const json_value_type type){
     if (val->type != type){
-        char err[1000];
-        sprintf(err, "%s: expected type %s but %s given", section_name,
+        raise_error("%s: expected type %s but %s given", section_name,
                  json_value_type_str[type], json_value_type_str[val->type]);
     }
 }
@@ -48,7 +49,7 @@ json_value* lookup(char *key){
 json_value* lookup_with_check(char *key){
   json_value *val = lookup(key);
   if (val == NULL){
-    //char err
+    raise_error("Item %s not found in current section", key);
   }
 }
 
@@ -61,6 +62,10 @@ void config_create(const char *filename){
 }
 
 bool config_get_bool(const char *key, ...){
-
+  char str[1000];
+  format(str, key);
+  json_value* val = lookup_with_check(key);
+  check_value_type(key, val, json_boolean);
+  return val->u.b_value;
 }
 

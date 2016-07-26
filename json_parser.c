@@ -324,8 +324,8 @@ json_value* json_parse(const char* file_name, char* error){
      lexeme *l = parse_lexeme(error);
 
      if (l != NULL){
-        printf(l->str);
-        printf("\n");
+        //printf(l->str);
+        //printf("\n");
         switch (l->type){
         case open_brake:
             tmp = top;

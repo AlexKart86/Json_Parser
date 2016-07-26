@@ -45,6 +45,12 @@ int main(){
 
  config_create("d:\\JSon_Parser\\sample.conf");
 
+ if (config_get_bool("scale"))
+    printf("YES!!!!");
+ else
+    printf("NOOOOOO");
+
+
 /* json_value* p = json_parse("k:\\DOCS\\JSON_Parser\\test2.json", error);
  if (strlen(error)>0) {
     printf(error);
