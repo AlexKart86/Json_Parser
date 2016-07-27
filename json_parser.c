@@ -81,7 +81,6 @@ lexeme *parse_lexeme(char *error){
     lexeme *res = (lexeme *)malloc(sizeof(lexeme));
     res->str[0]='\0';
     char ch;
-    int length = 0;
     short is_inline_comments = 0;
     short is_block_comments = 0;
     short is_in_s_quote = 0;

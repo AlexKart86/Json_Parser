@@ -1,4 +1,13 @@
+#ifndef JSON_PARSER_H
+#define JSON_PARSER_H 1
+
+
 #include "stdbool.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif  /* __cplusplus */
+
 
 //Json value types
 typedef enum {
@@ -48,4 +57,8 @@ void print_json(json_value* arr);
 //Destroy and nil values
 void free_and_nil(json_value **val);
 
+#ifdef __cplusplus
+}      /* extern "C" */
+#endif  /* __cplusplus */
 
+#endif /*JSON_PARSER_H*/
