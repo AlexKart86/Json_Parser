@@ -302,6 +302,40 @@ void print_json(json_value* arr){
      }
 }
 
+//Destuctor
+void destroy(json_value *val){
+   if (val == NULL)
+      return;
+   switch (val->type){
+    case json_boolean:
+    case json_double:
+    case json_long:
+        free(val);
+        break;
+    case json_string:
+        free(val->u.s_value);
+        free(val);
+        break;
+    case json_array:
+        for (int i=0; i<val->u.arr.len; ++i){
+            destroy(val->u.arr.values[i]);
+        }
+        free(val);
+        break;
+    case json_section:
+        for (int i=0; i<val->u.section.len; ++i){
+            destroy(val->u.section.sections[i]);
+        }
+        free(val);
+        break;
+   }
+}
+
+void free_and_nil(json_value **val){
+    destroy(*val);
+    *val = NULL;
+}
+
 json_value* json_parse(const char* file_name, char* error){
   in = fopen(file_name, "rb");
   cur_column = 1;
@@ -338,6 +372,7 @@ json_value* json_parse(const char* file_name, char* error){
             if (top == NULL || top->type != json_section){
                sprintf(error, "Error: invalid symbol '}' on line %d column %d", cur_row, cur_column);
                fclose(in);
+               destroy(root);
                return NULL;
             }
             top = top->parent;
@@ -356,6 +391,7 @@ json_value* json_parse(const char* file_name, char* error){
               if (top == NULL || top->type != json_array){
                 sprintf(error, "Error: invalid symbol ']' on line %d column %d", cur_row, cur_column);
                 fclose(in);
+                destroy(root);
                 return NULL;
               }
               top = top->parent;
@@ -385,7 +421,7 @@ json_value* json_parse(const char* file_name, char* error){
         if (strlen(error) == 0)
           return root;
         else
-          //TO DO free objects
+          destroy(root);
           return NULL;
      }
 

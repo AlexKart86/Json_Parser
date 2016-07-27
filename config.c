@@ -71,13 +71,13 @@ json_value* lookup_with_check(char *key){
 //If section doesn't have [ function doesn't change str and
 //set -1 at index;
 void str_extract_idx(char *str, int* index){
-  char* ch = strtok(str, "[");
-  if (!strcmp(ch, str))
+  if (strchr(str, '[') == NULL)
       *index = -1;
   else
   {
-    char *str = strtok(NULL, "]");
-    *index = atoi(str);
+    strtok(str, "[");
+    char *idx = strtok(NULL, "]");
+    *index = atoi(idx);
   }
 }
 
@@ -107,6 +107,36 @@ bool config_get_bool(const char *key, ...){
   return val->u.b_value;
 }
 
+long config_get_long(const char *key, ...){
+  char v_key[1000];
+  int idx;
+  PARSE_INPUT_STR(v_key, key, &idx);
+  json_value* val = LOOKUP(v_key, idx);
+  check_value_type(v_key, val, json_long);
+  return val->u.l_value;
+}
+
+double config_get_double(const char *key, ...){
+  char v_key[1000];
+  int idx;
+  PARSE_INPUT_STR(v_key, key, &idx);
+  json_value* val = LOOKUP(v_key, idx);
+  check_value_type(v_key, val, json_double);
+  return val->u.d_value;
+}
+
+
+char * config_get_string(const char *key, ...){
+  char v_key[1000];
+  int idx;
+  PARSE_INPUT_STR(v_key, key, &idx);
+  json_value* val = LOOKUP(v_key, idx);
+  check_value_type(v_key, val, json_string);
+  char *res = malloc(strlen(val->u.s_value)+1);
+  strcpy(res, val->u.s_value);
+  return res;
+}
+
 void config_open_section(const char *key, ...){
   char v_key[1000];
   FORMAT(v_key, key);
@@ -121,15 +151,38 @@ void config_close_section(void){
   current = current->parent;
 }
 
-char * config_get_string(const char *key, ...){
+
+
+//Obtain size of array
+unsigned int config_get_arr_size(const char *key, ...){
+  char v_key[1000];
+  FORMAT(v_key, key);
+  json_value* arr = lookup_with_check(v_key);
+  check_value_type(v_key, arr, json_array);
+  return arr->u.arr.len;
+}
+
+bool config_exist_value(const char *key, ...){
   char v_key[1000];
   int idx;
   PARSE_INPUT_STR(v_key, key, &idx);
-  json_value* val = LOOKUP(v_key, idx);
-  check_value_type(v_key, val, json_string);
-  char *res = malloc(strlen(val->u.s_value)+1);
-  strcpy(res, val->u.s_value);
-  return res;
+  json_value* val =  lookup(v_key);
+  //Additional checks for array
+  if (idx >= 0) {
+    if ( val == NULL || val->type != json_array ||
+         config_get_arr_size(v_key)-1 < idx)
+       return false;
+    else
+        return true;
+  }
+  else
+    return val != NULL;
+}
+
+
+void config_destroy(void){
+    free_and_nil(&root);
+    current = NULL;
 }
 
 

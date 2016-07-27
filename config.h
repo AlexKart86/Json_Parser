@@ -30,6 +30,9 @@ char *
 config_get_string(const char *key, ...)
                 __attribute__ ((format (printf, 1, 2)));
 
+//Obtain size of array
+unsigned int config_get_arr_size(const char *key, ...)
+                __attribute__ ((format (printf, 1, 2)));
 
 bool
 config_exist_value(const char *key, ...)
@@ -47,6 +50,7 @@ config_close_section(void);
 
 void
 config_destroy(void);
+
 
 
 #ifdef __cplusplus
