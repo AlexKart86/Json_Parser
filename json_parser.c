@@ -1,8 +1,9 @@
 #include "json_parser.h"
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
-#include "ctype.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <errno.h>
 
 typedef enum{
   open_brake,
@@ -57,13 +58,19 @@ lexeme_type detect_lexeme_type(char *str){
    if (!strcmp(str, "true")|| !strcmp(str, "false")){
                 return b_value;
               }
-   if (atol(str)||!strcmp(str, "0")){
-                return i_value;
-              }
-    if (atof(str) || !strcmp(str, "0.0")){
-                return d_value;
-      }
-    //TO DO: hex parse
+   //detect long
+   char *p = str;
+   errno = 0;
+   strtol(str, &p, 10);
+   if (errno == 0 && *p == 0)
+      return i_value;
+   //detect double
+   errno = 0;
+   strtod(str, &p);
+   if (errno == 0 && *p == 0)
+     return d_value;
+
+   //TO DO: hex parse
        else{
           return string;
     }

@@ -22,12 +22,13 @@
 1469211966 k:\docs\json_parser\config.h
 	<stdbool.h>
 
-1469601854 source:d:\json_parser\json_parser.c
+1469604736 source:d:\json_parser\json_parser.c
 	"json_parser.h"
-	"stdio.h"
-	"stdlib.h"
-	"string.h"
-	"ctype.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<errno.h>
 
 1469601812 d:\json_parser\json_parser.h
 	"stdbool.h"
