@@ -22,15 +22,15 @@
 1469211966 k:\docs\json_parser\config.h
 	<stdbool.h>
 
-1469606428 source:d:\json_parser\json_parser.c
-	"json_parser.h"
+1469690456 source:d:\json_parser\json_parser.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<ctype.h>
 	<errno.h>
+	"json_parser.h"
 
-1469605882 d:\json_parser\json_parser.h
+1469690462 d:\json_parser\json_parser.h
 	"stdbool.h"
 
 1469598280 source:d:\json_parser\test.c
@@ -39,7 +39,7 @@
 	"json_parser.h"
 	"config.h"
 
-1469602962 source:d:\json_parser\sample_main.c
+1469690475 source:d:\json_parser\sample_main.c
 	<stdio.h>
 	<stdbool.h>
 	<stdlib.h>
@@ -48,9 +48,11 @@
 1469602811 d:\json_parser\config.h
 	<stdbool.h>
 
-1469683921 source:d:\json_parser\config.c
+1469689194 source:d:\json_parser\config.c
 	"config.h"
 	"json_parser.h"
 	<stdio.h>
 	<stdarg.h>
+	<string.h>
+	<stdlib.h>
 

@@ -19,7 +19,7 @@ typedef enum {
    json_array
 } json_value_type;
 
-static const char* json_value_type_str[] = {"long", "double", "string", "boolean", "section", "array"};
+extern const char* json_value_type_str[];
 
 //Pair: <key: value>
 typedef struct _section_item{

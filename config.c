@@ -2,6 +2,8 @@
 #include "json_parser.h"
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
+#include <stdlib.h>
 
 //--------Internal functions-----------//
 
@@ -51,9 +53,9 @@ void check_value_type(char* section_name, json_value* val, const json_value_type
 //Find value by key in currect section
 json_value* lookup(char *key){
    check_value_type(key, current, json_section);
-   for (int i=0; i<current->u.section.len; ++i){
+   for (unsigned int i=0; i<current->u.section.len; ++i){
      if (!strcmp(key, current->u.section.sections[i]->name))
-        return current->u.section.sections[i]->value;
+        return (json_value *) current->u.section.sections[i]->value;
    }
    return NULL;
 }
@@ -64,7 +66,7 @@ json_value* lookup_with_check(char *key){
   if (val == NULL){
     raise_error("Item %s not found in current section", key);
   }
-  return val ;
+  return val;
 }
 
 //Separate input string into section name and array index
@@ -82,7 +84,7 @@ void str_extract_idx(char *str, int* index){
   }
 }
 
-json_value* lookup_array(char *key, int index){
+json_value* lookup_array(char *key, unsigned int index){
   json_value* arr = lookup_with_check(key);
   check_value_type(key, arr, json_array);
   if (arr->u.arr.len <= index )
@@ -149,7 +151,7 @@ void config_open_section(const char *key, ...){
 void config_close_section(void){
   if (current->parent == NULL)
     raise_error("Error: this is a root section");
-  current = current->parent;
+  current = (json_value *) current->parent;
 }
 
 
@@ -171,7 +173,7 @@ bool config_exist_value(const char *key, ...){
   //Additional checks for array
   if (idx >= 0) {
     if ( val == NULL || val->type != json_array ||
-         config_get_arr_size(v_key)-1 < idx)
+        (int)  config_get_arr_size(v_key)-1 < idx)
        return false;
     else
         return true;

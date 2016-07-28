@@ -15,7 +15,7 @@ int main()
     printf("Running sample_main by %s\n", vendor); // ABCsoft
     free(vendor);
 
-    // long int msize = config_get_long("min_file_size"); // здесь падаем - нет такого параметра
+    // long int msize = config_get_long("min_file_size");
 
     config_open_section("module_properties");
 
@@ -26,7 +26,7 @@ int main()
     if (config_exist_value("some_value"))
         printf("WTF!\n");
 
-    for ( int i = 0; i < config_get_arr_size("ip"); ++i)
+    for (unsigned int i = 0; i < config_get_arr_size("ip"); ++i)
         {
             char * ip = config_get_string("ip[%d]", i);
             printf("ip[%d]= %s\n", i, ip);
@@ -34,7 +34,7 @@ int main()
         }
     config_close_section();
 
-    // config_close_section(); // здесь падаем - больше нечего закрывать
+    // config_close_section();
 
     config_destroy();
 

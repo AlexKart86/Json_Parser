@@ -42,9 +42,6 @@
 		<Unit filename="sample_main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="test.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Extensions>
 			<code_completion />
 			<envvars />

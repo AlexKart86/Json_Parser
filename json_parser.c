@@ -1,9 +1,11 @@
-#include "json_parser.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
+#include "json_parser.h"
+
+const char* json_value_type_str[] = {"long", "double", "string", "boolean", "section", "array"};
 
 typedef enum{
   open_brake,
@@ -206,7 +208,7 @@ json_value* new_complex_value(json_value** top, json_value** root, json_value_ty
     json_value *value = (json_value *)malloc(sizeof(json_value));
 
     if (v_type == json_array || v_type == json_section){
-        value->parent = *top;
+        value->parent = (struct _json_value *) *top;
         value->type = v_type;
         switch (v_type){
         case json_array:
@@ -217,6 +219,8 @@ json_value* new_complex_value(json_value** top, json_value** root, json_value_ty
             value->u.section.len = 0;
             value->u.section.sections = NULL;
             break;
+        default:
+            return NULL;
         }
         value->u.section.len = 0;
         *top = value;
@@ -229,7 +233,7 @@ json_value* new_complex_value(json_value** top, json_value** root, json_value_ty
 
 json_value* new_simple_value(json_value* top, lexeme lex){
   json_value *value = (json_value *)malloc(sizeof(json_value));
-  value->parent = top;
+  value->parent = (struct _json_value *) top;
   switch (lex.type){
       case string:
            value->u.s_value = strcpy_a(lex.str);
@@ -253,6 +257,8 @@ json_value* new_simple_value(json_value* top, lexeme lex){
             else
                 value->u.b_value = false;
             break;
+      default:
+          return NULL;
   }
   return value;
 }
@@ -262,7 +268,7 @@ json_value* new_simple_value(json_value* top, lexeme lex){
 void add_section_item(json_value *top, char* section_name, json_value* value){
     section_item* it = (section_item *)malloc(sizeof(section_item));
     it->name = strcpy_a(section_name);
-    it->value = value;
+    it->value = (struct  _json_value *) value;
     top->u.section.len ++;
     top->u.section.sections = realloc(top->u.section.sections, sizeof(section_item)*top->u.section.len);
     top->u.section.sections[top->u.section.len-1] = it;
@@ -293,16 +299,16 @@ void print_json(json_value* arr){
         break;
     case json_array:
         printf(" [ ");
-        for (int i=0; i<arr->u.arr.len; ++i){
+        for (unsigned int i=0; i<arr->u.arr.len; ++i){
             print_json(arr->u.arr.values[i]);
         }
         printf(" ]");
         break;
     case json_section:
         {
-            for (int i=0; i<arr->u.section.len; ++i){
+            for (unsigned int i=0; i<arr->u.section.len; ++i){
                 printf("%s : ", arr->u.section.sections[i]->name);
-                print_json(arr->u.section.sections[i]->value);
+                print_json((json_value *) arr->u.section.sections[i]->value);
             }
         }
      }
@@ -323,14 +329,14 @@ void destroy(json_value *val){
         free(val);
         break;
     case json_array:
-        for (int i=0; i<val->u.arr.len; ++i){
+        for (unsigned int i=0; i<val->u.arr.len; ++i){
             destroy(val->u.arr.values[i]);
         }
         free(val);
         break;
     case json_section:
-        for (int i=0; i<val->u.section.len; ++i){
-            destroy(val->u.section.sections[i]);
+        for (unsigned int i=0; i<val->u.section.len; ++i){
+            destroy((json_value *) val->u.section.sections[i]);
         }
         free(val);
         break;
@@ -381,7 +387,7 @@ json_value* json_parse(const char* file_name, char* error){
                destroy(root);
                return NULL;
             }
-            top = top->parent;
+            top = (json_value *) top->parent;
             break;
         case d_point:
             strcpy(section_name, prev_lex->str);
@@ -400,7 +406,7 @@ json_value* json_parse(const char* file_name, char* error){
                 destroy(root);
                 return NULL;
               }
-              top = top->parent;
+              top = (json_value *) top->parent;
               break;
 
         case string:
@@ -419,7 +425,11 @@ json_value* json_parse(const char* file_name, char* error){
                add_array_item(top, val);
             }
             break;
+        case comma:
+             //Nothing to do
+             break;
         }
+
      }
      else
      {
