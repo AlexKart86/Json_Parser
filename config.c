@@ -64,6 +64,7 @@ json_value* lookup_with_check(char *key){
   if (val == NULL){
     raise_error("Item %s not found in current section", key);
   }
+  return val;
 }
 
 //Separate input string into section name and array index
